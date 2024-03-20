@@ -1,3 +1,9 @@
+/**
+ * Returns user information from cache.
+ *
+ * @param {string} githubUsername
+ * @return {Promise<null|{data: {slug: string, profile:string}, expire: number}>}
+ */
 async function checkCache( githubUsername ) {
 	const cache = await self.caches.open( 'wordpressers-on-github' );
 	const req = new Request(
@@ -38,7 +44,7 @@ async function getUserFromCache( githubUsername ) {
 	if ( result ) {
 		const ttl = result.expire - Date.now();
 		if ( ttl > 0 ) {
-			return result.slug;
+			return result.data;
 		}
 	}
 	return null;
@@ -100,3 +106,4 @@ chrome.runtime.onMessage.addListener( ( message, sender, sendResponse ) => {
 
 	return false;
 } );
+

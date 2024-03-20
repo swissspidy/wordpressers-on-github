@@ -1,11 +1,13 @@
+const HAS_VISITED = 'wogHasVisited';
+
 window.addEventListener( 'load', async () => {
-	const observer = new MutationObserver( ( mutations ) => {
+	const observer = new MutationObserver( async ( mutations ) => {
 		for ( const mutation of mutations ) {
 			for ( const node of mutation.addedNodes ) {
 				if ( node.nodeType !== Node.ELEMENT_NODE ) {
 					continue;
 				}
-				findAndAddBadges( node );
+				await findAndAddBadges( node );
 			}
 		}
 	} );
@@ -26,8 +28,6 @@ async function findAndAddBadges( root ) {
 
 	await Promise.all( promises );
 }
-
-const HAS_VISITED = 'wogHasVisited';
 
 function findGitHubLogins( element ) {
 	const loginMap = {};
@@ -71,8 +71,8 @@ function findGitHubLogins( element ) {
 	return loginMap;
 }
 
-async function addWordPressLogos( githubUsernames, elements ) {
-	const result = await lookupUser( githubUsernames );
+async function addWordPressLogos( githubUsername, elements ) {
+	const result = await lookupUser( githubUsername );
 	if ( ! result || ! result.profile ) {
 		return;
 	}
@@ -93,10 +93,10 @@ function addWordPressLogo( url, element ) {
 
 	const mark = document.createElement( 'img' );
 	mark.src = chrome.runtime.getURL( 'images/wp-logo.png' );
-	mark.width = 15;
-	mark.height = 15;
-	mark.style.verticalAlign = 'text-bottom';
-	mark.style.marginLeft = '5px';
+	mark.width = 12;
+	mark.height = 12;
+	mark.style.verticalAlign = 'middle';
+	mark.style.marginLeft = '2px';
 	profileLink.appendChild( mark );
 
 	element.appendChild( profileLink );
