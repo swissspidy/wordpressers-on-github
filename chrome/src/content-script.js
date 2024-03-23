@@ -99,7 +99,13 @@ function addWordPressLogo( url, element ) {
 	mark.style.marginLeft = '2px';
 	profileLink.appendChild( mark );
 
-	element.appendChild( profileLink );
+	if ( ! element.checkVisibility || element.checkVisibility() ) {
+		if ( element.tagName === 'A' ) {
+			element.insertAdjacentElement( 'afterend', profileLink );
+		} else {
+			element.appendChild( profileLink );
+		}
+	}
 
 	element.dataset[ HAS_VISITED ] = 'true';
 }
