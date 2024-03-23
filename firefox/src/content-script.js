@@ -173,17 +173,23 @@ function addWordPressLogo( result, element ) {
 	profileLink.setAttribute( 'href', result.profile );
 	profileLink.classList.add('tooltipped', 'tooltipped-s');
 	profileLink.setAttribute('aria-label', result.slug);
+	profileLink.style.paddingLeft = '2px';
 
 	const mark = document.createElement( 'img' );
 	mark.src = browser.runtime.getURL( 'images/wp-logo.png' );
 	mark.width = 12;
 	mark.height = 12;
 	mark.style.verticalAlign = 'middle';
-	mark.style.marginLeft = '2px';
 	profileLink.appendChild( mark );
 
 	if ( ! element.checkVisibility || element.checkVisibility() ) {
 		if ( element.tagName === 'A' ) {
+			profileLink.style.paddingRight = window.getComputedStyle( element, null ).getPropertyValue( 'padding-right' );
+
+			if ( profileLink.style.paddingRight !== '0px' ) {
+				profileLink.style.paddingLeft = '0px';
+			}
+
 			element.insertAdjacentElement( 'afterend', profileLink );
 		} else {
 			element.appendChild( profileLink );
