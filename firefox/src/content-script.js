@@ -100,18 +100,26 @@ async function addWordPressLogos( githubUsername, elements ) {
 	}
 
 	for ( const e of elements ) {
-		addWordPressLogo( result.profile, e );
+		addWordPressLogo( result, e );
 	}
 }
 
-function addWordPressLogo( url, element ) {
+/**
+ * Add a WordPress logo to the given element.
+ *
+ * @param {{slug: string, profile:string}} result
+ * @param {HTMLElement} element
+ */
+function addWordPressLogo( result, element ) {
 	if ( element.dataset[ HAS_VISITED ] ) {
 		return;
 	}
 
 	const profileLink = document.createElement( 'a' );
 	profileLink.target = '_blank';
-	profileLink.setAttribute( 'href', url );
+	profileLink.setAttribute( 'href', result.profile );
+	profileLink.classList.add('tooltipped', 'tooltipped-s');
+	profileLink.setAttribute('aria-label', result.slug);
 
 	const mark = document.createElement( 'img' );
 	mark.src = browser.runtime.getURL( 'images/wp-logo.png' );
