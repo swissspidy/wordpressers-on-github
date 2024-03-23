@@ -31,6 +31,59 @@ async function init() {
 	} );
 
 	await findAndAddBadges( document.documentElement );
+
+	await addVcard( document.documentElement );
+}
+
+async function addVcard( root ) {
+	const vcardList = root.querySelector( 'ul.vcard-details' );
+	if ( ! vcardList ) {
+		return;
+	}
+
+	if ( vcardList.dataset[ HAS_VISITED ] ) {
+		return;
+	}
+
+	const vcardUsername = root.querySelector( '.vcard-username' );
+	if ( ! vcardUsername ) {
+		return;
+	}
+
+	const matches = vcardUsername.innerText.match(/[a-z0-9-]+/ );
+
+	if ( ! matches ) {
+		return;
+	}
+
+	const githubUsername = matches[ 0 ];
+
+	const result = await lookupUser( githubUsername );
+	if ( ! result || ! result.profile ) {
+		return;
+	}
+
+	const vcardDetail = document.createElement( 'li' );
+	vcardDetail.setAttribute( 'itemprop', 'social' );
+	vcardDetail.classList.add( 'vcard-detail', 'pt-1' );
+
+	const mark = document.createElement( 'img' );
+	mark.src = chrome.runtime.getURL( 'images/wp-logo.png' );
+	mark.width = 16;
+	mark.height = 16;
+	mark.classList.add('octicon');
+	vcardDetail.appendChild( mark );
+
+	const profileLink = document.createElement( 'a' );
+	profileLink.target = '_blank';
+	profileLink.setAttribute( 'href', result.profile );
+	profileLink.textContent = `@${result.slug}`;
+	profileLink.classList.add('Link--primary');
+	vcardDetail.appendChild( profileLink );
+
+	vcardList.appendChild( vcardDetail );
+
+	vcardList.dataset[ HAS_VISITED ] = 'true';
 }
 
 if ( 'complete' === document.readyState ) {
