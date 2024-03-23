@@ -32,7 +32,7 @@ async function addVcard( root ) {
 		return;
 	}
 
-	const matches = vcardUsername.innerText.match(/[a-z0-9-]+/ );
+	const matches = vcardUsername.innerText.match( /[a-z0-9-]+/ );
 
 	if ( ! matches ) {
 		return;
@@ -53,14 +53,14 @@ async function addVcard( root ) {
 	mark.src = chrome.runtime.getURL( 'images/wp-logo.png' );
 	mark.width = 16;
 	mark.height = 16;
-	mark.classList.add('octicon');
+	mark.classList.add( 'octicon' );
 	vcardDetail.appendChild( mark );
 
 	const profileLink = document.createElement( 'a' );
 	profileLink.target = '_blank';
 	profileLink.setAttribute( 'href', result.profile );
-	profileLink.textContent = `@${result.slug}`;
-	profileLink.classList.add('Link--primary');
+	profileLink.textContent = `@${ result.slug }`;
+	profileLink.classList.add( 'Link--primary' );
 	vcardDetail.appendChild( profileLink );
 
 	if ( vcardList.dataset[ HAS_VISITED ] ) {
@@ -149,8 +149,8 @@ function addWordPressLogo( result, element ) {
 	const profileLink = document.createElement( 'a' );
 	profileLink.target = '_blank';
 	profileLink.setAttribute( 'href', result.profile );
-	profileLink.classList.add('tooltipped', 'tooltipped-s');
-	profileLink.setAttribute('aria-label', result.slug);
+	profileLink.classList.add( 'tooltipped', 'tooltipped-s' );
+	profileLink.setAttribute( 'aria-label', result.slug );
 	profileLink.style.paddingLeft = '2px';
 
 	const mark = document.createElement( 'img' );
@@ -162,7 +162,9 @@ function addWordPressLogo( result, element ) {
 
 	if ( ! element.checkVisibility || element.checkVisibility() ) {
 		if ( element.tagName === 'A' ) {
-			profileLink.style.paddingRight = window.getComputedStyle( element, null ).getPropertyValue( 'padding-right' );
+			profileLink.style.paddingRight = window
+				.getComputedStyle( element, null )
+				.getPropertyValue( 'padding-right' );
 
 			if ( profileLink.style.paddingRight !== '0px' ) {
 				profileLink.style.paddingLeft = '0px';
