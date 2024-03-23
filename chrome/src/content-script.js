@@ -8,6 +8,7 @@ window.addEventListener( 'load', async () => {
 					continue;
 				}
 				await findAndAddBadges( node );
+				await addVcard( document.documentElement );
 			}
 		}
 	} );
@@ -17,17 +18,12 @@ window.addEventListener( 'load', async () => {
 	} );
 
 	await findAndAddBadges( document.documentElement );
-
 	await addVcard( document.documentElement );
 } );
 
 async function addVcard( root ) {
 	const vcardList = root.querySelector( 'ul.vcard-details' );
 	if ( ! vcardList ) {
-		return;
-	}
-
-	if ( vcardList.dataset[ HAS_VISITED ] ) {
 		return;
 	}
 
@@ -66,6 +62,10 @@ async function addVcard( root ) {
 	profileLink.textContent = `@${result.slug}`;
 	profileLink.classList.add('Link--primary');
 	vcardDetail.appendChild( profileLink );
+
+	if ( vcardList.dataset[ HAS_VISITED ] ) {
+		return;
+	}
 
 	vcardList.appendChild( vcardDetail );
 

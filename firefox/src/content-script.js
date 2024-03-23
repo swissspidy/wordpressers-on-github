@@ -14,13 +14,14 @@
 const HAS_VISITED = 'wogHasVisited';
 
 async function init() {
-	const observer = new MutationObserver( ( mutations ) => {
+	const observer = new MutationObserver( async ( mutations ) => {
 		for ( const mutation of mutations ) {
 			for ( const node of mutation.addedNodes ) {
 				if ( node.nodeType !== Node.ELEMENT_NODE ) {
 					continue;
 				}
-				findAndAddBadges( node );
+				await findAndAddBadges( node );
+				await addVcard( document.documentElement );
 			}
 		}
 	} );
@@ -31,17 +32,12 @@ async function init() {
 	} );
 
 	await findAndAddBadges( document.documentElement );
-
 	await addVcard( document.documentElement );
 }
 
 async function addVcard( root ) {
 	const vcardList = root.querySelector( 'ul.vcard-details' );
 	if ( ! vcardList ) {
-		return;
-	}
-
-	if ( vcardList.dataset[ HAS_VISITED ] ) {
 		return;
 	}
 
@@ -80,6 +76,10 @@ async function addVcard( root ) {
 	profileLink.textContent = `@${result.slug}`;
 	profileLink.classList.add('Link--primary');
 	vcardDetail.appendChild( profileLink );
+
+	if ( vcardList.dataset[ HAS_VISITED ] ) {
+		return;
+	}
 
 	vcardList.appendChild( vcardDetail );
 
