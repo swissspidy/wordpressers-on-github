@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "WordPressers on GitHub",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Show WordPress.org profiles for users on GitHub.",
 	"default_locale": "en",
 	"permissions": [ "storage" ],

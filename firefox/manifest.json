@@ -1,13 +1,18 @@
 {
-	"manifest_version": 3,
+	"manifest_version": 2,
 	"name": "WordPressers on GitHub",
-	"version": "0.0.1",
+	"version": "1.0.1",
 	"description": "Show WordPress.org profiles for users on GitHub.",
 	"default_locale": "en",
-	"permissions": [ "storage" ],
-	"host_permissions": [
-		"https://github.com/*",
-		"https://profiles.wordpress.org/*"
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "wordpressers-on-github@pascalbirchler.com"
+		}
+	},
+	"permissions": [
+	  "storage",
+	  "https://github.com/*",
+	  "https://profiles.wordpress.org/*"
 	],
 	"background": {
 		"scripts": [ "src/background.js" ],
@@ -20,10 +25,7 @@
 		}
 	],
 	"web_accessible_resources": [
-		{
-			"resources": [ "images/wp-logo.png" ],
-			"matches": [ "https://github.com/*" ]
-		}
+	  "images/wp-logo.png"
 	],
 	"icons": {
 		"16": "/images/wp-16.png",
