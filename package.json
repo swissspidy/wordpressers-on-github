@@ -16,6 +16,6 @@
 	"devDependencies": {
 		"@types/firefox-webext-browser": "^120.0.3",
 		"@wordpress/scripts": "^30.11.0",
-		"chrome-types": "^0.1.340"
+		"chrome-types": "^0.1.343"
 	}
 }
