@@ -14,7 +14,7 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json"
 	},
 	"devDependencies": {
-		"@types/firefox-webext-browser": "^120.0.5",
+		"@types/firefox-webext-browser": "^143.0.0",
 		"@wordpress/scripts": "^30.25.0",
 		"chrome-types": "^0.1.383"
 	}
