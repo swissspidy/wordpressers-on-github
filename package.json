@@ -1,21 +1,52 @@
 {
 	"name": "wordpressers-on-github",
-	"version": "0.0.1",
+	"version": "1.0.1",
 	"description": "Show WordPress.org profiles for users on GitHub.",
-	"type": "module",
 	"author": "Pascal Birchler",
 	"license": "Apache-2.0",
+	"keywords": [
+		"browser-extension",
+		"chrome-extension",
+		"firefox-addon",
+		"github",
+		"wordpress"
+	],
+	"homepage": "https://github.com/swissspidy/wordpressers-on-github",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/swissspidy/wordpressers-on-github.git"
+	},
+	"bugs": {
+		"url": "https://github.com/swissspidy/wordpressers-on-github/issues"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@vitest/coverage-v8": "^4.1.11",
+		"@wordpress/scripts": "^34.2.0",
+		"adm-zip": "^0.6.0",
+		"chrome-types": "^0.1.440",
+		"esbuild": "^0.28.2",
+		"jsdom": "^30.0.1",
+		"playwright": "^1.62.1",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.11"
+	},
 	"scripts": {
+		"build": "node scripts/build.mjs",
+		"dev": "node scripts/build.mjs --watch",
 		"format": "wp-scripts format",
 		"lint:js": "wp-scripts lint-js",
 		"lint:js:fix": "wp-scripts lint-js --fix",
 		"lint:md:docs": "wp-scripts lint-md-docs",
-		"lint:md:js": "wp-scripts lint-md-js",
-		"lint:pkg-json": "wp-scripts lint-pkg-json"
-	},
-	"devDependencies": {
-		"@types/firefox-webext-browser": "^143.0.0",
-		"@wordpress/scripts": "^30.25.0",
-		"chrome-types": "^0.1.415"
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"lint:types": "tsc --noEmit",
+		"package": "npm run build && node scripts/package.mjs",
+		"test": "vitest run --project unit",
+		"test:coverage": "vitest run --project unit --coverage",
+		"test:e2e": "npm run build && vitest run --project e2e",
+		"test:watch": "vitest --project unit"
 	}
 }
