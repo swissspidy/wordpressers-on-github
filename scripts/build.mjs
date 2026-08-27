@@ -98,13 +98,19 @@ function watchStaticInputs( contexts ) {
 		}, 50 );
 	};
 
-	for ( const path of [
-		assetsDir,
-		manifestsDir,
-		join( rootDir, 'package.json' ),
-	] ) {
+	for ( const path of [ assetsDir, manifestsDir ] ) {
 		watchPath( path, { recursive: true }, rebuild );
 	}
+
+	// Watching `package.json` directly would stop working as soon as an editor
+	// saved it by renaming a new file over the old one, since the watch follows
+	// the replaced file rather than the name. Watching the directory it lives
+	// in survives that.
+	watchPath( rootDir, ( _event, filename ) => {
+		if ( filename === 'package.json' ) {
+			rebuild();
+		}
+	} );
 }
 
 await rm( buildDir, { recursive: true, force: true } );
