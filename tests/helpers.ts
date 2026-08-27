@@ -84,7 +84,6 @@ export function renderContext( profiles: Record< string, WordPressProfile > ) {
 			async ( githubUsername: string ) =>
 				profiles[ githubUsername ] ?? null
 		),
-		resourceUrl: ( path: string ) => `chrome-extension://test/${ path }`,
 	};
 }
 

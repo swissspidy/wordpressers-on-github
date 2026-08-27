@@ -15,7 +15,7 @@ const EXTENSION_PATH = join( process.cwd(), 'build', 'chrome' );
 /** Stands in for a GitHub page mentioning two users. */
 const GITHUB_PAGE = `<!doctype html>
 <html lang="en">
-	<body>
+	<body style="color: rgb(1, 2, 3)">
 		<a href="/swissspidy" data-hovercard-type="user"
 			data-hovercard-url="/users/swissspidy/hovercard">swissspidy</a>
 		<a href="/octocat" data-hovercard-type="user"
@@ -95,16 +95,18 @@ describe( 'the extension in Chrome', () => {
 		expect( await badges().count() ).toBe( 1 );
 	} );
 
-	it( 'loads the logo from the extension', async () => {
-		const logo = badges().first().locator( 'img' );
+	it( 'renders the logo in the page colour', async () => {
+		const logo = badges().first().locator( 'svg' );
 		await logo.waitFor();
 
 		expect(
-			await logo.evaluate(
-				( image: HTMLImageElement ) =>
-					image.complete && image.naturalWidth > 0
-			)
-		).toBe( true );
+			await logo.evaluate( ( svg: SVGElement ) => ( {
+				drawn: svg.getBoundingClientRect().width > 0,
+				// `currentColor` only resolves to something once the mark is
+				// really part of the page, which is the point of inlining it.
+				fill: getComputedStyle( svg ).fill,
+			} ) )
+		).toEqual( { drawn: true, fill: 'rgb(1, 2, 3)' } );
 	} );
 
 	it( 'adds the profile link to the details list', async () => {

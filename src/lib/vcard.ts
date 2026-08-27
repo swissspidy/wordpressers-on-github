@@ -46,7 +46,7 @@ export async function addVcard(
 	vcardDetail.setAttribute( 'itemprop', 'social' );
 	vcardDetail.classList.add( 'vcard-detail', 'pt-1' );
 
-	const logo = createLogo( context, 16 );
+	const logo = createLogo( 16 );
 	logo.classList.add( 'octicon' );
 	vcardDetail.appendChild( logo );
 

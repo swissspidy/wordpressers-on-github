@@ -1,15 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getResourceUrl, onMessage, sendMessage } from '../src/lib/browser';
+import { onMessage, sendMessage } from '../src/lib/browser';
 
 /**
  * Builds a stand-in for a browser's extension API namespace.
- *
- * @param prefix Prefix used by the fake `getURL` implementation.
  */
-function fakeApi( prefix: string ) {
+function fakeApi() {
 	return {
 		runtime: {
-			getURL: vi.fn( ( path: string ) => `${ prefix }/${ path }` ),
 			sendMessage: vi.fn( async () => 'response' ),
 			onMessage: { addListener: vi.fn() },
 		},
@@ -21,35 +18,37 @@ describe( 'browser', () => {
 		vi.unstubAllGlobals();
 	} );
 
-	it( 'prefers the promise-based browser namespace of Firefox', () => {
-		vi.stubGlobal( 'browser', fakeApi( 'moz-extension://test' ) );
-		vi.stubGlobal( 'chrome', fakeApi( 'chrome-extension://test' ) );
+	it( 'prefers the promise-based browser namespace of Firefox', async () => {
+		const firefox = fakeApi();
+		vi.stubGlobal( 'browser', firefox );
+		vi.stubGlobal( 'chrome', fakeApi() );
 
-		expect( getResourceUrl( 'images/wp-logo.png' ) ).toBe(
-			'moz-extension://test/images/wp-logo.png'
-		);
+		await sendMessage( { type: 'getUser' } );
+
+		expect( firefox.runtime.sendMessage ).toHaveBeenCalled();
 	} );
 
-	it( 'falls back to the chrome namespace', () => {
+	it( 'falls back to the chrome namespace', async () => {
+		const chrome = fakeApi();
 		vi.stubGlobal( 'browser', undefined );
-		vi.stubGlobal( 'chrome', fakeApi( 'chrome-extension://test' ) );
+		vi.stubGlobal( 'chrome', chrome );
 
-		expect( getResourceUrl( 'images/wp-logo.png' ) ).toBe(
-			'chrome-extension://test/images/wp-logo.png'
-		);
+		await sendMessage( { type: 'getUser' } );
+
+		expect( chrome.runtime.sendMessage ).toHaveBeenCalled();
 	} );
 
 	it( 'explains itself when no extension API is available', () => {
 		vi.stubGlobal( 'browser', undefined );
 		vi.stubGlobal( 'chrome', undefined );
 
-		expect( () => getResourceUrl( 'images/wp-logo.png' ) ).toThrow(
+		expect( () => onMessage( () => true ) ).toThrow(
 			'No extension API available'
 		);
 	} );
 
 	it( 'passes messages to the runtime', async () => {
-		const api = fakeApi( 'chrome-extension://test' );
+		const api = fakeApi();
 		vi.stubGlobal( 'browser', undefined );
 		vi.stubGlobal( 'chrome', api );
 
@@ -62,7 +61,7 @@ describe( 'browser', () => {
 	} );
 
 	it( 'hides the sender argument from message listeners', () => {
-		const api = fakeApi( 'chrome-extension://test' );
+		const api = fakeApi();
 		vi.stubGlobal( 'browser', undefined );
 		vi.stubGlobal( 'chrome', api );
 

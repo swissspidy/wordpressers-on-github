@@ -7,11 +7,5 @@
 	],
 	"background": {
 		"service_worker": "background.js"
-	},
-	"web_accessible_resources": [
-		{
-			"resources": [ "images/wp-logo.png" ],
-			"matches": [ "https://github.com/*" ]
-		}
-	]
+	}
 }

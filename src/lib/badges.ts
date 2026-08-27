@@ -64,12 +64,10 @@ export function findGitHubLogins(
 /**
  * Adds a WordPress logo linking to the given profile to a single element.
  *
- * @param context Rendering context.
  * @param profile Profile to link to.
  * @param element Element referencing the user.
  */
 export function addBadge(
-	context: RenderContext,
 	profile: WordPressProfile,
 	element: HTMLElement
 ): void {
@@ -83,8 +81,11 @@ export function addBadge(
 	profileLink.classList.add( 'tooltipped', 'tooltipped-s' );
 	profileLink.setAttribute( 'aria-label', profile.slug );
 	profileLink.style.paddingLeft = '2px';
+	// Follow the surrounding text rather than the link colour, so the mark
+	// stays legible in both of GitHub's themes.
+	profileLink.style.color = 'inherit';
 
-	const logo = createLogo( context, 12 );
+	const logo = createLogo( 12 );
 	logo.style.verticalAlign = 'middle';
 	profileLink.appendChild( logo );
 
@@ -131,7 +132,7 @@ export async function addBadges(
 			}
 
 			for ( const element of elements ) {
-				addBadge( context, profile, element );
+				addBadge( profile, element );
 			}
 		} )
 	);

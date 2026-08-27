@@ -1,3 +1,5 @@
+// The WordPress mark, taken unchanged from simple-icons (CC0-1.0).
+import logoMarkup from '../wp-logo.svg';
 import type { ProfileLookup } from './types';
 
 /**
@@ -9,14 +11,12 @@ export const HAS_VISITED = 'wogHasVisited';
 /**
  * Everything the DOM helpers need from their environment.
  *
- * Passing these in rather than reaching for the extension APIs directly keeps
+ * Passing this in rather than reaching for the extension APIs directly keeps
  * the DOM logic usable — and testable — outside of a browser extension.
  */
 export interface RenderContext {
 	/** Resolves a GitHub login into a WordPress.org profile. */
 	lookupProfile: ProfileLookup;
-	/** Returns the URL of a file bundled with the extension. */
-	resourceUrl: ( path: string ) => string;
 }
 
 /**
@@ -38,19 +38,30 @@ export function markVisited( element: HTMLElement ): void {
 }
 
 /**
- * Creates the WordPress logo image shown next to a username.
+ * Creates the WordPress logo shown next to a username.
  *
- * @param context Rendering context.
- * @param size    Width and height in pixels.
+ * The mark is inlined rather than loaded from an `<img>`, so that it can be
+ * filled with `currentColor` and follow whichever theme GitHub is rendering
+ * in. A file loaded through `<img>` cannot see the page's colours, and the
+ * mark is dark enough to disappear against a dark background.
+ *
+ * @param size Width and height in pixels.
  */
-export function createLogo(
-	context: RenderContext,
-	size: number
-): HTMLImageElement {
-	const logo = document.createElement( 'img' );
-	logo.src = context.resourceUrl( 'images/wp-logo.png' );
-	logo.width = size;
-	logo.height = size;
-	logo.alt = '';
+export function createLogo( size: number ): SVGElement {
+	const parsed = new DOMParser().parseFromString(
+		logoMarkup,
+		'image/svg+xml'
+	);
+	const logo = document.importNode(
+		parsed.documentElement,
+		true
+	) as unknown as SVGElement;
+
+	logo.setAttribute( 'width', String( size ) );
+	logo.setAttribute( 'height', String( size ) );
+	logo.setAttribute( 'fill', 'currentColor' );
+	logo.setAttribute( 'aria-hidden', 'true' );
+	logo.setAttribute( 'focusable', 'false' );
+
 	return logo;
 }

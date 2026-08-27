@@ -25,8 +25,8 @@ a fix only ever has to be made once.
 
 | Path         | Contents                                                     |
 |--------------|--------------------------------------------------------------|
-| `src`        | Extension sources. `background.ts` and `content-script.ts` are the entry points, everything else lives in `src/lib`. |
-| `assets`     | Icons and translations, copied into every build as-is.        |
+| `src`        | Extension sources. `background.ts` and `content-script.ts` are the entry points, everything else lives in `src/lib`. `wp-logo.svg` is the badge shown next to a username, inlined into the bundle at build time so it can follow GitHub's theme. |
+| `assets`     | Extension icons and translations, copied into every build as-is. The icons stay PNG because Chrome does not accept anything else. |
 | `manifests`  | `base.json` holds what both browsers share; `chrome.json` and `firefox.json` add what differs between Manifest V3 and V2. The version comes from `package.json`. |
 | `scripts`    | Build tooling.                                                |
 | `tests`      | Unit tests, plus an end-to-end test in `tests/e2e` that loads the built extension into Chromium. |
@@ -36,6 +36,7 @@ Install the dependencies with `npm install`, then:
 ```sh
 npm run build       # Build both extensions into build/
 npm run dev         # Same, rebuilding as files change
+npm run package     # Build, then zip both up for the extension stores
 npm test            # Run the unit tests
 npm run test:watch  # Run the unit tests as files change
 npm run test:e2e    # Build, then run the extension in Chromium

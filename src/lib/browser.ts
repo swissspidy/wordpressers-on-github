@@ -28,15 +28,6 @@ function extensionApi(): typeof chrome {
 }
 
 /**
- * Returns the fully qualified URL of a file bundled with the extension.
- *
- * @param path Path relative to the extension root, e.g. `images/wp-logo.png`.
- */
-export function getResourceUrl( path: string ): string {
-	return extensionApi().runtime.getURL( path );
-}
-
-/**
  * Sends a message to the background script and resolves with its response.
  *
  * @param message Message to send.

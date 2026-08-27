@@ -1,12 +1,34 @@
-import { defineConfig } from 'vitest/config';
+import { readFileSync } from 'node:fs';
+import { defineConfig, type Plugin } from 'vitest/config';
+
+/**
+ * Loads SVG assets as markup, matching the build's `text` loader.
+ */
+function svgAsText(): Plugin {
+	return {
+		name: 'svg-as-text',
+		enforce: 'pre',
+		load( id ) {
+			if ( ! id.endsWith( '.svg' ) ) {
+				return null;
+			}
+
+			return `export default ${ JSON.stringify(
+				readFileSync( id, 'utf8' )
+			) };`;
+		},
+	};
+}
 
 export default defineConfig( {
+	plugins: [ svgAsText() ],
 	test: {
 		coverage: {
 			include: [ 'src/**/*.ts', 'scripts/**/*.mjs' ],
 		},
 		projects: [
 			{
+				plugins: [ svgAsText() ],
 				test: {
 					name: 'unit',
 					environment: 'jsdom',

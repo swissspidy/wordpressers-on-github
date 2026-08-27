@@ -65,6 +65,9 @@ async function createContext( target ) {
 		// purpose: both extension stores review the code that ships.
 		format: 'iife',
 		target: [ 'chrome110', 'firefox115' ],
+		// The logo is inlined into the page rather than loaded as a file, so
+		// that it can pick up GitHub's text colour.
+		loader: { '.svg': 'text' },
 		sourcemap: watch,
 		logLevel: 'info',
 		plugins: [ assetsPlugin( target, outdir ) ],

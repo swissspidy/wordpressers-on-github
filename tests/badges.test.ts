@@ -84,8 +84,8 @@ describe( 'addBadges', () => {
 		const badge = badgesIn( document.body )[ 0 ];
 		expect( badge ).toBeTruthy();
 		expect( badge?.getAttribute( 'aria-label' ) ).toBe( PROFILE.slug );
-		expect( badge?.querySelector( 'img' )?.src ).toContain(
-			'images/wp-logo.png'
+		expect( badge?.querySelector( 'svg' )?.getAttribute( 'fill' ) ).toBe(
+			'currentColor'
 		);
 	} );
 

@@ -1,5 +1,5 @@
 import { addBadges } from './lib/badges';
-import { getResourceUrl, sendMessage } from './lib/browser';
+import { sendMessage } from './lib/browser';
 import type { RenderContext } from './lib/elements';
 import type { GetUserMessage, WordPressProfile } from './lib/types';
 import { addVcard } from './lib/vcard';
@@ -19,7 +19,6 @@ const context: RenderContext = {
 			return null;
 		}
 	},
-	resourceUrl: getResourceUrl,
 };
 
 /**

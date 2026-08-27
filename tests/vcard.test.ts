@@ -31,9 +31,7 @@ describe( 'addVcard', () => {
 		const link = details()?.querySelector( 'a' );
 		expect( link?.getAttribute( 'href' ) ).toBe( PROFILE.profile );
 		expect( link?.textContent ).toBe( `@${ PROFILE.slug }` );
-		expect( details()?.querySelector( 'img' )?.src ).toContain(
-			'images/wp-logo.png'
-		);
+		expect( details()?.querySelector( 'svg' ) ).toBeTruthy();
 	} );
 
 	it( 'adds the link only once', async () => {
