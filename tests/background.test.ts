@@ -52,11 +52,7 @@ describe( 'background', () => {
 	} );
 
 	it( 'answers with null when the lookup fails', async () => {
-		vi.stubGlobal( 'caches', {
-			open: async () => {
-				throw new Error( 'no cache storage' );
-			},
-		} );
+		stubFetch( 'boom', 500 );
 		const listener = await loadBackground();
 		const { promise, resolve } = deferred< unknown >();
 
@@ -67,6 +63,25 @@ describe( 'background', () => {
 		);
 
 		await expect( promise ).resolves.toBeNull();
+	} );
+
+	it( 'answers even when the cache is unusable', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => {
+				throw new Error( 'no cache storage' );
+			},
+		} );
+		stubFetch( PROFILE );
+		const listener = await loadBackground();
+		const { promise, resolve } = deferred< unknown >();
+
+		listener(
+			{ type: 'getUser', githubUsername: 'swissspidy' },
+			{},
+			resolve
+		);
+
+		await expect( promise ).resolves.toEqual( PROFILE );
 	} );
 
 	it.each( [
