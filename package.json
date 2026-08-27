@@ -30,7 +30,7 @@
 		"esbuild": "^0.28.2",
 		"jsdom": "^30.0.1",
 		"playwright": "^1.62.1",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.3",
 		"vitest": "^4.1.11"
 	},
 	"scripts": {
