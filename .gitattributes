@@ -9,4 +9,6 @@
 .prettierignore export-ignore
 package.json export-ignore
 package-lock.json export-ignore
+tests export-ignore
 tsconfig.json export-ignore
+vitest.config.ts export-ignore

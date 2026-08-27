@@ -21,10 +21,14 @@
 	},
 	"type": "module",
 	"devDependencies": {
+		"@vitest/coverage-v8": "^4.1.11",
 		"@wordpress/scripts": "^30.25.0",
 		"chrome-types": "^0.1.415",
 		"esbuild": "^0.28.2",
-		"typescript": "^5.9.3"
+		"jsdom": "^30.0.1",
+		"playwright": "^1.56.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.11"
 	},
 	"scripts": {
 		"build": "node scripts/build.mjs",
@@ -34,6 +38,10 @@
 		"lint:js:fix": "wp-scripts lint-js --fix",
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
-		"lint:types": "tsc --noEmit"
+		"lint:types": "tsc --noEmit",
+		"test": "vitest run --project unit",
+		"test:coverage": "vitest run --project unit --coverage",
+		"test:e2e": "npm run build && vitest run --project e2e",
+		"test:watch": "vitest --project unit"
 	}
 }
