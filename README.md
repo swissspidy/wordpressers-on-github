@@ -26,7 +26,7 @@ a fix only ever has to be made once.
 | Path         | Contents                                                     |
 |--------------|--------------------------------------------------------------|
 | `src`        | Extension sources. `background.ts` and `content-script.ts` are the entry points, everything else lives in `src/lib`. `wp-logo.svg` is the badge shown next to a username, inlined into the bundle at build time so it can follow GitHub's theme. |
-| `assets`     | Extension icons and translations, copied into every build as-is. The icons stay PNG because Chrome does not accept anything else. |
+| `assets`     | Extension icons and translations, copied into every build as-is. The icons are PNG rather than SVG, which manifest icons do not support. |
 | `manifests`  | `base.json` holds what both browsers share; `chrome.json` and `firefox.json` add what differs between Manifest V3 and V2. The version comes from `package.json`. |
 | `scripts`    | Build tooling.                                                |
 | `tests`      | Unit tests, plus an end-to-end test in `tests/e2e` that loads the built extension into Chromium. |
