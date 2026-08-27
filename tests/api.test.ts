@@ -111,6 +111,33 @@ describe( 'getProfile', () => {
 		expect( succeeding ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'still resolves a profile when the cache is unusable', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => {
+				throw new Error( 'denied' );
+			},
+		} );
+		stubFetch( PROFILE );
+
+		// `getProfile` promises never to reject; a broken Cache Storage costs
+		// a repeat request, not the lookup.
+		await expect( getProfile( 'swissspidy' ) ).resolves.toEqual( PROFILE );
+	} );
+
+	it( 'keeps a profile the cache refused to store', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => ( {
+				match: async () => undefined,
+				put: async () => {
+					throw new Error( 'quota exceeded' );
+				},
+			} ),
+		} );
+		stubFetch( PROFILE );
+
+		await expect( getProfile( 'swissspidy' ) ).resolves.toEqual( PROFILE );
+	} );
+
 	it( 'sends credentials with the lookup request', async () => {
 		const fetchMock = stubFetch( PROFILE );
 

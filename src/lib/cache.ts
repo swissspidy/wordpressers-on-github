@@ -30,21 +30,24 @@ const MISS: CacheResult = { hit: false };
 /**
  * Reads a cached lookup result, treating expired entries as a miss.
  *
+ * The cache is only an optimisation, so a browser that refuses to open or
+ * read it reports a miss rather than failing the lookup.
+ *
  * @param githubUsername GitHub login to look up.
  */
 export async function readFromCache(
 	githubUsername: string
 ): Promise< CacheResult > {
-	const cache = await caches.open( CACHE_NAME );
-	const response = await cache.match( lookupUrl( githubUsername ) );
-
-	if ( ! response ) {
-		return MISS;
-	}
-
-	let entry: CacheEntry;
+	let entry: CacheEntry | undefined;
 
 	try {
+		const cache = await caches.open( CACHE_NAME );
+		const response = await cache.match( lookupUrl( githubUsername ) );
+
+		if ( ! response ) {
+			return MISS;
+		}
+
 		entry = ( await response.json() ) as CacheEntry;
 	} catch {
 		return MISS;
@@ -60,6 +63,9 @@ export async function readFromCache(
 /**
  * Stores a lookup result, including the absence of a profile.
  *
+ * Remembering the result is best effort: failing to store it costs another
+ * request later, which is no reason to fail the lookup that just succeeded.
+ *
  * @param githubUsername GitHub login the result belongs to.
  * @param data           Resolved profile, or `null` if there is none.
  */
@@ -67,14 +73,19 @@ export async function writeToCache(
 	githubUsername: string,
 	data: WordPressProfile | null
 ): Promise< void > {
-	const cache = await caches.open( CACHE_NAME );
 	const entry: CacheEntry = {
 		data,
 		expire: Date.now() + ( data ? POSITIVE_TTL : NEGATIVE_TTL ),
 	};
 
-	await cache.put(
-		lookupUrl( githubUsername ),
-		new Response( JSON.stringify( entry ) )
-	);
+	try {
+		const cache = await caches.open( CACHE_NAME );
+
+		await cache.put(
+			lookupUrl( githubUsername ),
+			new Response( JSON.stringify( entry ) )
+		);
+	} catch {
+		// Nothing to do: the next lookup simply goes to the network again.
+	}
 }

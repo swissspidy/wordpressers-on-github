@@ -67,6 +67,42 @@ describe( 'cache', () => {
 		expect( await readFromCache( 'octocat' ) ).toEqual( { hit: false } );
 	} );
 
+	it( 'treats a cache that will not open as a miss', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => {
+				throw new Error( 'denied' );
+			},
+		} );
+
+		expect( await readFromCache( 'swissspidy' ) ).toEqual( { hit: false } );
+	} );
+
+	it( 'treats a failing lookup in the cache as a miss', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => ( {
+				match: async () => {
+					throw new Error( 'denied' );
+				},
+			} ),
+		} );
+
+		expect( await readFromCache( 'swissspidy' ) ).toEqual( { hit: false } );
+	} );
+
+	it( 'shrugs off a cache that will not store anything', async () => {
+		vi.stubGlobal( 'caches', {
+			open: async () => ( {
+				put: async () => {
+					throw new Error( 'quota exceeded' );
+				},
+			} ),
+		} );
+
+		await expect(
+			writeToCache( 'swissspidy', PROFILE )
+		).resolves.toBeUndefined();
+	} );
+
 	it( 'treats an unreadable entry as a miss', async () => {
 		const cache = installFakeCaches();
 		await cache.put(
