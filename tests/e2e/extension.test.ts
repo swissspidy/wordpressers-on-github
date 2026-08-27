@@ -1,7 +1,12 @@
 import { access, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { chromium, type BrowserContext, type Page } from 'playwright';
+import {
+	chromium,
+	type BrowserContext,
+	type Page,
+	type Worker,
+} from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PROFILE } from '../helpers';
 
@@ -22,6 +27,7 @@ const GITHUB_PAGE = `<!doctype html>
 
 let context: BrowserContext;
 let page: Page;
+let worker: Worker;
 const pageErrors: string[] = [];
 
 beforeAll( async () => {
@@ -48,8 +54,7 @@ beforeAll( async () => {
 	);
 
 	const [ existing ] = context.serviceWorkers();
-	const worker =
-		existing ?? ( await context.waitForEvent( 'serviceworker' ) );
+	worker = existing ?? ( await context.waitForEvent( 'serviceworker' ) );
 
 	// WordPress.org is not reachable from a test run, so the background script
 	// gets a stand-in that answers the way the lookup API does.
@@ -130,6 +135,18 @@ describe( 'the extension in Chrome', () => {
 		await page.locator( 'span[data-hovercard-type="user"] a' ).waitFor();
 
 		expect( await badges().count() ).toBe( 2 );
+	} );
+
+	it( 'resolves its name and description from the locale file', async () => {
+		expect(
+			await worker.evaluate( () => ( {
+				name: chrome.i18n.getMessage( 'appTitle' ),
+				description: chrome.i18n.getMessage( 'appDescription' ),
+			} ) )
+		).toEqual( {
+			name: 'WordPressers on GitHub',
+			description: 'Show WordPress.org profiles for users on GitHub.',
+		} );
 	} );
 
 	it( 'runs without raising errors', () => {

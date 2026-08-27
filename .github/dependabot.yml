@@ -7,6 +7,15 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
+    groups:
+      # Everything here is tooling, so routine bumps travel together in one
+      # pull request. Majors still arrive separately, to be reviewed on their
+      # own.
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: '/'
@@ -14,3 +23,7 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    groups:
+      actions:
+        patterns:
+          - '*'

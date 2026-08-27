@@ -78,6 +78,25 @@ describe( 'buildManifest', () => {
 	} );
 
 	it.each( TARGETS )(
+		'only uses message placeholders the %s locale defines',
+		async ( target ) => {
+			const messages = JSON.parse(
+				await readFile( 'assets/_locales/en/messages.json', 'utf8' )
+			);
+			const placeholders = [
+				...JSON.stringify( manifests[ target ] ).matchAll(
+					/__MSG_(\w+)__/g
+				),
+			].map( ( match ) => match[ 1 ] );
+
+			expect( placeholders.length ).toBeGreaterThan( 0 );
+			expect( Object.keys( messages ) ).toEqual(
+				expect.arrayContaining( placeholders )
+			);
+		}
+	);
+
+	it.each( TARGETS )(
 		'only references scripts the %s build emits',
 		async ( target ) => {
 			const entryPoints = ( await readdir( 'src' ) )

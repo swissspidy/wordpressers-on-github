@@ -7,7 +7,6 @@ import { buildManifest, TARGETS } from './manifest.mjs';
 const rootDir = join( dirname( fileURLToPath( import.meta.url ) ), '..' );
 const buildDir = join( rootDir, 'build' );
 const assetsDir = join( rootDir, 'assets' );
-const manifestsDir = join( rootDir, 'manifests' );
 
 const watch = process.argv.includes( '--watch' );
 

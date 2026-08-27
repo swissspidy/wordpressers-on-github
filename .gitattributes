@@ -1,6 +1,6 @@
 .github export-ignore
 .editorconfig export-ignore
-.eslintrc export-ignore
+eslint.config.mjs export-ignore
 .gitattributes export-ignore
 .gitignore export-ignore
 .markdownlint.json export-ignore
