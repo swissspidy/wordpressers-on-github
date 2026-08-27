@@ -1,0 +1,17 @@
+{
+	"manifest_version": 3,
+	"permissions": [ "storage" ],
+	"host_permissions": [
+		"https://github.com/*",
+		"https://profiles.wordpress.org/*"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"web_accessible_resources": [
+		{
+			"resources": [ "images/wp-logo.png" ],
+			"matches": [ "https://github.com/*" ]
+		}
+	]
+}

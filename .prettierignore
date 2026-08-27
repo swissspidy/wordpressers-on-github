@@ -1,0 +1,8 @@
+build/
+coverage/
+package-lock.json
+
+# Indentation for YAML is governed by .editorconfig, which uses two spaces
+# where Prettier would use four.
+*.yml
+*.yaml

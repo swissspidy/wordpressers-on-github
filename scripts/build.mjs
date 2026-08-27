@@ -1,0 +1,90 @@
+import * as esbuild from 'esbuild';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildManifest, TARGETS } from './manifest.mjs';
+
+const rootDir = join( dirname( fileURLToPath( import.meta.url ) ), '..' );
+const buildDir = join( rootDir, 'build' );
+const assetsDir = join( rootDir, 'assets' );
+const manifestsDir = join( rootDir, 'manifests' );
+
+const watch = process.argv.includes( '--watch' );
+
+/**
+ * Copies the static assets and writes the generated manifest.
+ *
+ * Runs as part of every build so that watch mode picks up changes to assets
+ * and manifests, not just to the sources.
+ *
+ * @param {string} target Browser to build for.
+ * @param {string} outdir Directory to assemble the extension in.
+ * @return {import('esbuild').Plugin} esbuild plugin.
+ */
+function assetsPlugin( target, outdir ) {
+	return {
+		name: 'extension-assets',
+		setup( build ) {
+			build.onEnd( async ( { errors } ) => {
+				if ( errors.length > 0 ) {
+					return;
+				}
+
+				await mkdir( outdir, { recursive: true } );
+				await cp( assetsDir, outdir, { recursive: true } );
+				await writeFile(
+					join( outdir, 'manifest.json' ),
+					JSON.stringify(
+						await buildManifest( target ),
+						null,
+						'\t'
+					) + '\n'
+				);
+			} );
+		},
+	};
+}
+
+/**
+ * Bundles the entry points and assembles a loadable extension directory.
+ *
+ * @param {string} target Browser to build for.
+ * @return {Promise<import('esbuild').BuildContext>} Build context.
+ */
+async function createContext( target ) {
+	const outdir = join( buildDir, target );
+
+	return esbuild.context( {
+		entryPoints: [
+			join( rootDir, 'src', 'background.ts' ),
+			join( rootDir, 'src', 'content-script.ts' ),
+		],
+		outdir,
+		bundle: true,
+		// Content scripts cannot be ES modules, so each entry point is bundled
+		// into a self-contained script. The output stays unminified on
+		// purpose: both extension stores review the code that ships.
+		format: 'iife',
+		target: [ 'chrome110', 'firefox115' ],
+		sourcemap: watch,
+		logLevel: 'info',
+		plugins: [ assetsPlugin( target, outdir ) ],
+	} );
+}
+
+await rm( buildDir, { recursive: true, force: true } );
+
+const contexts = await Promise.all( TARGETS.map( createContext ) );
+
+if ( watch ) {
+	await Promise.all( contexts.map( ( context ) => context.watch() ) );
+	// eslint-disable-next-line no-console
+	console.log( `Watching for changes in ${ TARGETS.join( ', ' ) }…` );
+} else {
+	await Promise.all(
+		contexts.map( async ( context ) => {
+			await context.rebuild();
+			await context.dispose();
+		} )
+	);
+}

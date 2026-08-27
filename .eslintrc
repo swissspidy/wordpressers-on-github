@@ -1,6 +1,14 @@
 {
 	"root": true,
-	"extends": [
-		"plugin:@wordpress/eslint-plugin/recommended"
+	"extends": [ "plugin:@wordpress/eslint-plugin/recommended" ],
+	"overrides": [
+		{
+			// The bundled resolver predates package export maps, so it cannot
+			// find subpath exports such as `vitest/config`.
+			"files": [ "vitest.config.ts" ],
+			"rules": {
+				"import/no-unresolved": "off"
+			}
+		}
 	]
 }

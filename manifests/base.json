@@ -1,0 +1,17 @@
+{
+	"name": "WordPressers on GitHub",
+	"description": "Show WordPress.org profiles for users on GitHub.",
+	"default_locale": "en",
+	"content_scripts": [
+		{
+			"matches": [ "https://github.com/*" ],
+			"js": [ "content-script.js" ]
+		}
+	],
+	"icons": {
+		"16": "/images/wp-16.png",
+		"32": "/images/wp-32.png",
+		"48": "/images/wp-48.png",
+		"128": "/images/wp-128.png"
+	}
+}

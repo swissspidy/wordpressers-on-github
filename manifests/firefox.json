@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2,
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "wordpressers-on-github@pascalbirchler.com"
+		}
+	},
+	"permissions": [
+		"storage",
+		"https://github.com/*",
+		"https://profiles.wordpress.org/*"
+	],
+	"background": {
+		"scripts": [ "background.js" ]
+	},
+	"web_accessible_resources": [ "images/wp-logo.png" ]
+}

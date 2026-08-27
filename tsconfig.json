@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"lib": [ "ES2022", "DOM", "DOM.Iterable" ],
+		"types": [ "chrome-types" ],
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowJs": true,
+		"skipLibCheck": true,
+		"noEmit": true
+	},
+	"include": [ "src", "scripts" ]
+}
