@@ -27,7 +27,7 @@
 		"@vitest/coverage-v8": "^4.1.11",
 		"@wordpress/scripts": "^34.2.0",
 		"adm-zip": "^0.6.0",
-		"chrome-types": "^0.1.440",
+		"chrome-types": "^0.1.443",
 		"esbuild": "^0.28.2",
 		"jsdom": "^30.0.1",
 		"playwright": "^1.62.1",
