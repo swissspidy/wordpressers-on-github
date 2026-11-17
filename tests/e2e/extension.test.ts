@@ -139,6 +139,33 @@ describe( 'the extension in Chrome', () => {
 		expect( await badges().count() ).toBe( 2 );
 	} );
 
+	it( 'badges pull request author filter links and hydrated hovercards', async () => {
+		await page.evaluate( () => {
+			const filterLink = document.createElement( 'a' );
+			filterLink.dataset.testid = 'author-filter-link';
+			filterLink.href =
+				'/WordPress/gutenberg/pulls?q=is%3Apr+state%3Aopen+author%3Aswissspidy';
+			filterLink.textContent = 'swissspidy';
+
+			const hydrated = document.createElement( 'a' );
+			hydrated.id = 'hydrated-author';
+			hydrated.href = '/swissspidy';
+			hydrated.textContent = 'swissspidy';
+
+			document.body.append( filterLink, hydrated );
+
+			hydrated.dataset.hovercardType = 'user';
+			hydrated.dataset.hovercardUrl = '/users/swissspidy/hovercard';
+		} );
+
+		await page
+			.locator( 'a[data-testid="author-filter-link"] + a' )
+			.waitFor();
+		await page.locator( 'a#hydrated-author + a' ).waitFor();
+
+		expect( await badges().count() ).toBe( 4 );
+	} );
+
 	it( 'resolves its name and description from the locale file', async () => {
 		expect(
 			await worker.evaluate( () => ( {

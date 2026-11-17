@@ -69,6 +69,54 @@ describe( 'findGitHubLogins', () => {
 			'swissspidy',
 		] );
 	} );
+
+	it( 'finds a login on an author filter link in the pull requests list', () => {
+		document.body.innerHTML = `
+			<div class="container__W45oI6 description__mZjLFE">
+				<span><span>#86968</span></span>
+				<span data-testid="timestamp-container">
+					<span class="timestampSeparator__CQkME0" aria-hidden="true">·</span>
+					<a
+						class="filterLink__OXCGsP Link__H3GvIl"
+						data-testid="author-filter-link"
+						aria-label="Filter by author luisherranz"
+						href="/WordPress/gutenberg/pulls?q=sort%3Aupdated-desc+is%3Apr+state%3Aopen+author%3Aluisherranz+"
+					><img src="https://github.com/luisherranz.png?size=28">luisherranz</a>
+				</span>
+			</div>
+		`;
+
+		expect( [ ...findGitHubLogins( document.body ).keys() ] ).toEqual( [
+			'luisherranz',
+		] );
+	} );
+
+	it( 'falls back to text content for author filter buttons and attributed authors', () => {
+		document.body.innerHTML = `
+			<button type="button" data-testid="author-filter-link">
+				<span>Filter by author </span>swissspidy
+			</button>
+			<a data-testid="attributed-author-filter-link" href="/WordPress/gutenberg/pulls">
+				octocat
+			</a>
+		`;
+
+		expect( [ ...findGitHubLogins( document.body ).keys() ] ).toEqual( [
+			'swissspidy',
+			'octocat',
+		] );
+	} );
+
+	it( 'skips author filter links for bots', () => {
+		document.body.innerHTML = `
+			<a
+				data-testid="author-filter-link"
+				href="/WordPress/gutenberg/pulls?q=is%3Apr+state%3Aopen+author%3Adependabot%5Bbot%5D"
+			>dependabot[bot]</a>
+		`;
+
+		expect( findGitHubLogins( document.body ).size ).toBe( 0 );
+	} );
 } );
 
 describe( 'addBadges', () => {
@@ -89,15 +137,21 @@ describe( 'addBadges', () => {
 		);
 	} );
 
-	it( 'places the badge after a link, and inside anything else', async () => {
+	it( 'places the badge after a link or button, and inside anything else', async () => {
 		const link = userElement( 'swissspidy' );
+		const button = document.createElement( 'button' );
+		button.dataset.testid = 'author-filter-link';
+		button.textContent = 'swissspidy';
 		const span = userElement( 'swissspidy', 'span' );
-		document.body.append( link, span );
+		document.body.append( link, button, span );
 
 		await addBadges( context(), document.body );
 
 		expect( link.nextElementSibling ).toBe(
 			badgesIn( document.body )[ 0 ]
+		);
+		expect( button.nextElementSibling ).toBe(
+			badgesIn( document.body )[ 1 ]
 		);
 		expect( span.querySelector( 'a' ) ).toBe( badgesIn( span )[ 0 ] );
 	} );
