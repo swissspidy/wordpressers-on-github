@@ -28,7 +28,7 @@ export default defineConfig( {
 		},
 		projects: [
 			{
-				plugins: [ svgAsText() ],
+				extends: true,
 				test: {
 					name: 'unit',
 					environment: 'jsdom',
@@ -37,6 +37,7 @@ export default defineConfig( {
 				},
 			},
 			{
+				extends: true,
 				test: {
 					name: 'e2e',
 					environment: 'node',
