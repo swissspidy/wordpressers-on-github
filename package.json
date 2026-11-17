@@ -34,6 +34,9 @@
 		"typescript": "^6.0.3",
 		"vitest": "^5.1.0"
 	},
+	"overrides": {
+		"@playwright/test": "$playwright"
+	},
 	"scripts": {
 		"build": "node scripts/build.mjs",
 		"dev": "node scripts/build.mjs --watch",
