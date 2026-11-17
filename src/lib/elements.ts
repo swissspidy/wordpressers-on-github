@@ -23,8 +23,13 @@ export interface RenderContext {
  * Returns whether an element has already been handled.
  *
  * @param element Element to check.
+ * @param value   Optional value to match against the visited marker.
  */
-export function isVisited( element: HTMLElement ): boolean {
+export function isVisited( element: HTMLElement, value?: string ): boolean {
+	if ( value !== undefined ) {
+		return element.dataset[ HAS_VISITED ] === value;
+	}
+
 	return Boolean( element.dataset[ HAS_VISITED ] );
 }
 
@@ -32,9 +37,19 @@ export function isVisited( element: HTMLElement ): boolean {
  * Marks an element as handled.
  *
  * @param element Element to mark.
+ * @param value   Value to record on the visited marker.
  */
-export function markVisited( element: HTMLElement ): void {
-	element.dataset[ HAS_VISITED ] = 'true';
+export function markVisited( element: HTMLElement, value = 'true' ): void {
+	element.dataset[ HAS_VISITED ] = value;
+}
+
+/**
+ * Clears the handled marker from an element.
+ *
+ * @param element Element to clear.
+ */
+export function clearVisited( element: HTMLElement ): void {
+	delete element.dataset[ HAS_VISITED ];
 }
 
 /**

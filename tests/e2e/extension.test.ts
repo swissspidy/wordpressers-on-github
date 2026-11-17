@@ -153,15 +153,29 @@ describe( 'the extension in Chrome', () => {
 			hydrated.textContent = 'swissspidy';
 
 			document.body.append( filterLink, hydrated );
-
-			hydrated.dataset.hovercardType = 'user';
-			hydrated.dataset.hovercardUrl = '/users/swissspidy/hovercard';
 		} );
 
 		await page
-			.locator( 'a[data-testid="author-filter-link"] + a' )
+			.locator(
+				`a[data-testid="author-filter-link"] + a[href="${ PROFILE.profile }"]`
+			)
 			.waitFor();
-		await page.locator( 'a#hydrated-author + a' ).waitFor();
+
+		expect( await badges().count() ).toBe( 3 );
+
+		await page.evaluate( () => {
+			const hydrated =
+				document.querySelector< HTMLElement >( '#hydrated-author' );
+
+			if ( hydrated ) {
+				hydrated.dataset.hovercardType = 'user';
+				hydrated.dataset.hovercardUrl = '/users/swissspidy/hovercard';
+			}
+		} );
+
+		await page
+			.locator( `a#hydrated-author + a[href="${ PROFILE.profile }"]` )
+			.waitFor();
 
 		expect( await badges().count() ).toBe( 4 );
 	} );

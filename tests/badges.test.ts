@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { addBadges, findGitHubLogins } from '../src/lib/badges';
-import { PROFILE, renderContext, userElement } from './helpers';
+import type { WordPressProfile } from '../src/lib/types';
+import { deferred, PROFILE, renderContext, userElement } from './helpers';
 
 const context = () => renderContext( { swissspidy: PROFILE } );
 
@@ -193,5 +194,42 @@ describe( 'addBadges', () => {
 		await addBadges( context(), document.body );
 
 		expect( badgesIn( document.body ) ).toHaveLength( 1 );
+	} );
+
+	it( 'refreshes the badge when an element changes author', async () => {
+		const link = userElement( 'swissspidy' );
+		const span = userElement( 'swissspidy', 'span' );
+		document.body.append( link, span );
+
+		await addBadges( context(), document.body );
+		expect( badgesIn( document.body ) ).toHaveLength( 2 );
+
+		link.dataset.hovercardUrl = '/users/octocat/hovercard';
+		link.textContent = 'octocat';
+		span.dataset.hovercardUrl = '/users/octocat/hovercard';
+		span.textContent = 'octocat';
+
+		await addBadges( context(), link );
+		await addBadges( context(), span );
+
+		expect( badgesIn( document.body ) ).toHaveLength( 0 );
+	} );
+
+	it( 'skips adding a badge if the author changes while lookup is pending', async () => {
+		const element = userElement( 'swissspidy' );
+		document.body.append( element );
+		const lookup = deferred< WordPressProfile | null >();
+		const rendering = {
+			lookupProfile: vi.fn( () => lookup.promise ),
+		};
+
+		const pending = addBadges( rendering, document.body );
+		element.dataset.hovercardUrl = '/users/octocat/hovercard';
+		element.textContent = 'octocat';
+
+		lookup.resolve( PROFILE );
+		await pending;
+
+		expect( badgesIn( document.body ) ).toHaveLength( 0 );
 	} );
 } );
