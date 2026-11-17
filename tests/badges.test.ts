@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { addBadges, findGitHubLogins } from '../src/lib/badges';
-import { PROFILE, renderContext, userElement } from './helpers';
+import type { WordPressProfile } from '../src/lib/types';
+import { deferred, PROFILE, renderContext, userElement } from './helpers';
 
 const context = () => renderContext( { swissspidy: PROFILE } );
 
@@ -69,6 +70,54 @@ describe( 'findGitHubLogins', () => {
 			'swissspidy',
 		] );
 	} );
+
+	it( 'finds a login on an author filter link in the pull requests list', () => {
+		document.body.innerHTML = `
+			<div class="container__W45oI6 description__mZjLFE">
+				<span><span>#86968</span></span>
+				<span data-testid="timestamp-container">
+					<span class="timestampSeparator__CQkME0" aria-hidden="true">·</span>
+					<a
+						class="filterLink__OXCGsP Link__H3GvIl"
+						data-testid="author-filter-link"
+						aria-label="Filter by author swissspidy"
+						href="/WordPress/gutenberg/pulls?q=sort%3Aupdated-desc+is%3Apr+state%3Aopen+author%3Aswissspidy+"
+					><img src="https://github.com/swissspidy.png?size=28">swissspidy</a>
+				</span>
+			</div>
+		`;
+
+		expect( [ ...findGitHubLogins( document.body ).keys() ] ).toEqual( [
+			'swissspidy',
+		] );
+	} );
+
+	it( 'falls back to text content for author filter buttons and attributed authors', () => {
+		document.body.innerHTML = `
+			<button type="button" data-testid="author-filter-link">
+				<span>Filter by author </span>swissspidy
+			</button>
+			<a data-testid="attributed-author-filter-link" href="/WordPress/gutenberg/pulls">
+				octocat
+			</a>
+		`;
+
+		expect( [ ...findGitHubLogins( document.body ).keys() ] ).toEqual( [
+			'swissspidy',
+			'octocat',
+		] );
+	} );
+
+	it( 'skips author filter links for bots', () => {
+		document.body.innerHTML = `
+			<a
+				data-testid="author-filter-link"
+				href="/WordPress/gutenberg/pulls?q=is%3Apr+state%3Aopen+author%3Adependabot%5Bbot%5D"
+			>dependabot[bot]</a>
+		`;
+
+		expect( findGitHubLogins( document.body ).size ).toBe( 0 );
+	} );
 } );
 
 describe( 'addBadges', () => {
@@ -89,15 +138,21 @@ describe( 'addBadges', () => {
 		);
 	} );
 
-	it( 'places the badge after a link, and inside anything else', async () => {
+	it( 'places the badge after a link or button, and inside anything else', async () => {
 		const link = userElement( 'swissspidy' );
+		const button = document.createElement( 'button' );
+		button.dataset.testid = 'author-filter-link';
+		button.textContent = 'swissspidy';
 		const span = userElement( 'swissspidy', 'span' );
-		document.body.append( link, span );
+		document.body.append( link, button, span );
 
 		await addBadges( context(), document.body );
 
 		expect( link.nextElementSibling ).toBe(
 			badgesIn( document.body )[ 0 ]
+		);
+		expect( button.nextElementSibling ).toBe(
+			badgesIn( document.body )[ 1 ]
 		);
 		expect( span.querySelector( 'a' ) ).toBe( badgesIn( span )[ 0 ] );
 	} );
@@ -139,5 +194,42 @@ describe( 'addBadges', () => {
 		await addBadges( context(), document.body );
 
 		expect( badgesIn( document.body ) ).toHaveLength( 1 );
+	} );
+
+	it( 'refreshes the badge when an element changes author', async () => {
+		const link = userElement( 'swissspidy' );
+		const span = userElement( 'swissspidy', 'span' );
+		document.body.append( link, span );
+
+		await addBadges( context(), document.body );
+		expect( badgesIn( document.body ) ).toHaveLength( 2 );
+
+		link.dataset.hovercardUrl = '/users/octocat/hovercard';
+		link.textContent = 'octocat';
+		span.dataset.hovercardUrl = '/users/octocat/hovercard';
+		span.textContent = 'octocat';
+
+		await addBadges( context(), link );
+		await addBadges( context(), span );
+
+		expect( badgesIn( document.body ) ).toHaveLength( 0 );
+	} );
+
+	it( 'skips adding a badge if the author changes while lookup is pending', async () => {
+		const element = userElement( 'swissspidy' );
+		document.body.append( element );
+		const lookup = deferred< WordPressProfile | null >();
+		const rendering = {
+			lookupProfile: vi.fn( () => lookup.promise ),
+		};
+
+		const pending = addBadges( rendering, document.body );
+		element.dataset.hovercardUrl = '/users/octocat/hovercard';
+		element.textContent = 'octocat';
+
+		lookup.resolve( PROFILE );
+		await pending;
+
+		expect( badgesIn( document.body ) ).toHaveLength( 0 );
 	} );
 } );
