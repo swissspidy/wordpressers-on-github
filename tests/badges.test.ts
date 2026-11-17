@@ -79,15 +79,15 @@ describe( 'findGitHubLogins', () => {
 					<a
 						class="filterLink__OXCGsP Link__H3GvIl"
 						data-testid="author-filter-link"
-						aria-label="Filter by author luisherranz"
-						href="/WordPress/gutenberg/pulls?q=sort%3Aupdated-desc+is%3Apr+state%3Aopen+author%3Aluisherranz+"
-					><img src="https://github.com/luisherranz.png?size=28">luisherranz</a>
+						aria-label="Filter by author swissspidy"
+						href="/WordPress/gutenberg/pulls?q=sort%3Aupdated-desc+is%3Apr+state%3Aopen+author%3Aswissspidy+"
+					><img src="https://github.com/swissspidy.png?size=28">swissspidy</a>
 				</span>
 			</div>
 		`;
 
 		expect( [ ...findGitHubLogins( document.body ).keys() ] ).toEqual( [
-			'luisherranz',
+			'swissspidy',
 		] );
 	} );
 
