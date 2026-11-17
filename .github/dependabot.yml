@@ -8,14 +8,15 @@ updates:
     labels:
       - dependencies
     groups:
-      # Everything here is tooling, so routine bumps travel together in one
-      # pull request. Majors still arrive separately, to be reviewed on their
-      # own.
+      # Everything here is tooling, so bumps travel together in one pull
+      # request (including coupled major bumps like vitest and @vitest/*).
       dev-dependencies:
         dependency-type: development
-        update-types:
-          - minor
-          - patch
+    ignore:
+      # typescript-eslint does not yet support TypeScript 7.0.
+      - dependency-name: typescript
+        versions:
+          - '>= 7.0.0'
 
   - package-ecosystem: github-actions
     directory: '/'

@@ -23,13 +23,13 @@ Everywhere you see their username on GitHub, you'll see a small WordPress logo w
 Both browser versions are built from a single TypeScript codebase in `src`, so
 a fix only ever has to be made once.
 
-| Path         | Contents                                                     |
-|--------------|--------------------------------------------------------------|
-| `src`        | Extension sources. `background.ts` and `content-script.ts` are the entry points, everything else lives in `src/lib`. `wp-logo.svg` is the badge shown next to a username, inlined into the bundle at build time so it can follow GitHub's theme. |
-| `assets`     | Extension icons and translations, copied into every build as-is. The icons are PNG rather than SVG, which manifest icons do not support. |
-| `manifests`  | `base.json` holds what both browsers share; `chrome.json` and `firefox.json` add what differs between Manifest V3 and V2. The version comes from `package.json`. |
-| `scripts`    | Build tooling.                                                |
-| `tests`      | Unit tests, plus an end-to-end test in `tests/e2e` that loads the built extension into Chromium. |
+| Path | Contents |
+| --- | --- |
+| `src` | Extension sources. `background.ts` and `content-script.ts` are the entry points, everything else lives in `src/lib`. `wp-logo.svg` is the badge shown next to a username, inlined into the bundle at build time so it can follow GitHub's theme. |
+| `assets` | Extension icons and translations, copied into every build as-is. The icons are PNG rather than SVG, which manifest icons do not support. |
+| `manifests` | `base.json` holds what both browsers share; `chrome.json` and `firefox.json` add what differs between Manifest V3 and V2. The version comes from `package.json`. |
+| `scripts` | Build tooling. |
+| `tests` | Unit tests, plus an end-to-end test in `tests/e2e` that loads the built extension into Chromium. |
 
 Install the dependencies with `npm install`, then:
 

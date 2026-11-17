@@ -24,15 +24,15 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@vitest/coverage-v8": "^4.1.11",
-		"@wordpress/scripts": "^34.2.0",
-		"adm-zip": "^0.6.0",
-		"chrome-types": "^0.1.440",
+		"@vitest/coverage-v8": "^5.1.0",
+		"@wordpress/scripts": "^37.1.0",
+		"adm-zip": "^0.6.1",
+		"chrome-types": "^0.1.464",
 		"esbuild": "^0.28.2",
-		"jsdom": "^30.0.1",
-		"playwright": "^1.62.1",
+		"jsdom": "^31.0.1",
+		"playwright": "^1.65.1",
 		"typescript": "^6.0.3",
-		"vitest": "^4.1.11"
+		"vitest": "^5.1.0"
 	},
 	"scripts": {
 		"build": "node scripts/build.mjs",

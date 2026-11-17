@@ -22,8 +22,7 @@ interface CacheEntry {
  * kept distinct from a miss.
  */
 export type CacheResult =
-	| { hit: true; data: WordPressProfile | null }
-	| { hit: false };
+	{ hit: true; data: WordPressProfile | null } | { hit: false };
 
 const MISS: CacheResult = { hit: false };
 
