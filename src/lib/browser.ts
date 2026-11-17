@@ -7,17 +7,13 @@
  * and a single shared code path is enough.
  */
 
-declare global {
-	var browser: typeof chrome | undefined;
-}
-
 /**
  * Returns the extension API namespace provided by the current browser.
  *
  * Resolved lazily so that importing this module does not require the APIs to
  * be present, which keeps the surrounding logic testable outside a browser.
  */
-function extensionApi(): typeof chrome {
+function extensionApi(): typeof browser | typeof chrome {
 	const api = globalThis.browser ?? globalThis.chrome;
 
 	if ( ! api ) {
