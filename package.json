@@ -24,10 +24,10 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@vitest/coverage-v8": "^5.1.0",
+		"@vitest/coverage-v8": "^5.1.1",
 		"@wordpress/scripts": "^37.1.0",
 		"adm-zip": "^0.6.1",
-		"chrome-types": "^0.1.464",
+		"chrome-types": "^0.1.465",
 		"esbuild": "^0.28.2",
 		"jsdom": "^31.0.1",
 		"playwright": "^1.65.1",
