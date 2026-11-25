@@ -39,6 +39,13 @@ function init(): void {
 		const roots: ParentNode[] = [];
 
 		for ( const mutation of mutations ) {
+			if (
+				mutation.type === 'attributes' &&
+				mutation.target.nodeType === Node.ELEMENT_NODE
+			) {
+				roots.push( mutation.target as Element );
+			}
+
 			for ( const node of mutation.addedNodes ) {
 				if ( node.nodeType === Node.ELEMENT_NODE ) {
 					roots.push( node as Element );
@@ -52,6 +59,7 @@ function init(): void {
 	} );
 
 	observer.observe( document.documentElement, {
+		attributeFilter: [ 'data-hovercard-url' ],
 		childList: true,
 		subtree: true,
 	} );

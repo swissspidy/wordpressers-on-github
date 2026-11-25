@@ -1,4 +1,5 @@
 import {
+	clearVisited,
 	createLogo,
 	isVisited,
 	markVisited,
@@ -9,8 +10,81 @@ import type { WordPressProfile } from './types';
 /** Matches the hovercard URLs GitHub puts on elements referencing a user. */
 const HOVERCARD_URL = /^\/users\/([^/]+)\/hovercard/;
 
+/** Matches the `author:<login>` qualifier in pull request filter URLs. */
+const AUTHOR_FILTER_QUERY =
+	/(?:^|\s)author:([a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38})(?=$|\s)/i;
+
+/** Matches a valid GitHub username. */
+const GITHUB_USERNAME = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+
 /** Selects the elements GitHub marks as referencing a user. */
-const USER_SELECTOR = '[data-hovercard-type="user"]';
+const USER_SELECTOR = [
+	'[data-hovercard-type="user"]',
+	'[data-testid="author-filter-link"]',
+	'[data-testid="attributed-author-filter-link"]',
+].join( ', ' );
+
+/**
+ * Extracts a GitHub username from an element referencing a user.
+ *
+ * @param element Element matched by `USER_SELECTOR`.
+ */
+function getLogin( element: HTMLElement ): string | undefined {
+	if ( ! element.textContent || element.textContent.trim().length === 0 ) {
+		return undefined;
+	}
+
+	if ( element.dataset.hovercardUrl ) {
+		return element.dataset.hovercardUrl
+			.match( HOVERCARD_URL )?.[ 1 ]
+			?.trim();
+	}
+
+	if (
+		element.dataset.testid !== 'author-filter-link' &&
+		element.dataset.testid !== 'attributed-author-filter-link'
+	) {
+		return undefined;
+	}
+
+	const href = element.getAttribute( 'href' );
+
+	if ( href ) {
+		const query = new URL( href, 'https://github.com' ).searchParams.get(
+			'q'
+		);
+		const match = query?.match( AUTHOR_FILTER_QUERY );
+
+		if ( match ) {
+			return match[ 1 ];
+		}
+	}
+
+	const text = element.textContent
+		.trim()
+		.replace( /^Filter by author\s+/i, '' )
+		.trim();
+
+	return text && GITHUB_USERNAME.test( text ) ? text : undefined;
+}
+
+/**
+ * Removes an existing badge from an element and clears its visited marker.
+ *
+ * @param element Element referencing the user.
+ */
+function removeBadge( element: HTMLElement ): void {
+	const badge =
+		element.tagName === 'A' || element.tagName === 'BUTTON'
+			? element.nextElementSibling
+			: element.lastElementChild;
+
+	if ( badge instanceof HTMLElement && badge.dataset.wogBadge ) {
+		badge.remove();
+	}
+
+	clearVisited( element );
+}
 
 /**
  * Collects the elements that reference a GitHub user, grouped by login so that
@@ -24,26 +98,28 @@ export function findGitHubLogins(
 	const logins = new Map< string, HTMLElement[] >();
 	const cards: HTMLElement[] = [];
 
-	// A mutation can add an element that *is* a user reference rather than one
-	// containing them, which `querySelectorAll` on its own would miss.
-	if ( root instanceof Element && root.matches( USER_SELECTOR ) ) {
-		cards.push( root as HTMLElement );
+	// A mutation can add or update an element that *is* a user reference
+	// rather than one containing them, which `querySelectorAll` on its own
+	// would miss.
+	if (
+		root instanceof HTMLElement &&
+		( root.matches( USER_SELECTOR ) || isVisited( root ) )
+	) {
+		cards.push( root );
 	}
 
 	cards.push( ...root.querySelectorAll< HTMLElement >( USER_SELECTOR ) );
 
 	for ( const card of cards ) {
+		const login = getLogin( card );
+
 		if ( isVisited( card ) ) {
-			continue;
-		}
+			if ( login && isVisited( card, login ) ) {
+				continue;
+			}
 
-		if ( ! card.textContent || card.textContent.trim().length === 0 ) {
-			continue;
+			removeBadge( card );
 		}
-
-		const login = card.dataset.hovercardUrl
-			?.match( HOVERCARD_URL )?.[ 1 ]
-			?.trim();
 
 		if ( ! login ) {
 			continue;
@@ -76,6 +152,7 @@ export function addBadge(
 	}
 
 	const profileLink = document.createElement( 'a' );
+	profileLink.dataset.wogBadge = 'true';
 	profileLink.target = '_blank';
 	profileLink.setAttribute( 'href', profile.profile );
 	profileLink.classList.add( 'tooltipped', 'tooltipped-s' );
@@ -90,7 +167,7 @@ export function addBadge(
 	profileLink.appendChild( logo );
 
 	if ( ! element.checkVisibility || element.checkVisibility() ) {
-		if ( element.tagName === 'A' ) {
+		if ( element.tagName === 'A' || element.tagName === 'BUTTON' ) {
 			// Sit inside the link's own padding so the logo stays visually
 			// attached to the username instead of drifting away from it.
 			profileLink.style.paddingRight = window
@@ -107,7 +184,7 @@ export function addBadge(
 		}
 	}
 
-	markVisited( element );
+	markVisited( element, getLogin( element ) );
 }
 
 /**
@@ -132,6 +209,10 @@ export async function addBadges(
 			}
 
 			for ( const element of elements ) {
+				if ( getLogin( element ) !== login ) {
+					continue;
+				}
+
 				addBadge( profile, element );
 			}
 		} )
